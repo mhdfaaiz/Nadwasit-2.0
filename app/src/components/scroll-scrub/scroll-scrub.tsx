@@ -85,6 +85,8 @@ interface RuntimeSegment extends Segment {
   video?: HTMLVideoElement;
   objectUrl?: string;
   abort?: AbortController;
+  /** iOS only decodes a video that has been play()ed inside a user gesture. */
+  primed?: boolean;
 }
 
 interface Controller {
@@ -252,6 +254,7 @@ export function ScrollScrub({
       delete segment.video;
       delete segment.objectUrl;
       delete segment.loadedSource;
+      delete segment.primed;
       segment.loading = false;
       segment.ready = false;
       segment.failed = false;
@@ -281,15 +284,20 @@ export function ScrollScrub({
       dirty = true;
     };
 
-    const primeVideo = async (video?: HTMLVideoElement) => {
-      if (!video || !isMobile()) {
+    const primeVideo = async (segment: RuntimeSegment) => {
+      const video = segment.video;
+      if (!video || !isMobile() || segment.primed) {
         return;
       }
       try {
         await video.play();
         video.pause();
+        segment.primed = true;
       } catch {
-        // Keep the poster; a later user gesture/seek can retry naturally.
+        // iOS rejects play() outside a user gesture, and clips created later in
+        // the scroll are always created outside one. Leave this segment
+        // unprimed so the next touch retries it: without that retry the video
+        // never decodes and the chapter sits frozen on its poster.
       }
     };
 
@@ -357,7 +365,7 @@ export function ScrollScrub({
               segment.video === video &&
               segment.loadedSource === source
             ) {
-              void primeVideo(video);
+              void primeVideo(segment);
             }
           },
           { once: true }
@@ -445,6 +453,16 @@ export function ScrollScrub({
           y < segment.end + 1.5 * viewportHeight
         ) {
           void loadClip(segment);
+        } else if (
+          (segment.loading || segment.ready) &&
+          (y < segment.start - 3 * viewportHeight ||
+            y > segment.end + 3 * viewportHeight)
+        ) {
+          // Clips used to stay loaded for the whole page, so every chapter held
+          // a live decoder and a Blob at once. Phones ration both. Release the
+          // far ones; the 1.5 vs 3 viewport gap is hysteresis so a segment
+          // sitting near the boundary cannot thrash.
+          unloadClip(segment);
         }
       }
 
@@ -514,13 +532,13 @@ export function ScrollScrub({
       }
       layout();
     };
-    const onFirstGesture = () => {
-      if (userReady) {
-        return;
-      }
+    // NOT a one-shot. Segments load lazily as the visitor scrolls, so a clip
+    // created in chapter 3 or 4 has no gesture of its own to be primed inside.
+    // Every touch is another chance to prime whatever is still unprimed.
+    const onGesture = () => {
       userReady = true;
       for (const segment of runtime) {
-        void primeVideo(segment.video);
+        void primeVideo(segment);
       }
     };
 
@@ -545,14 +563,8 @@ export function ScrollScrub({
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     window.addEventListener("orientationchange", layout);
-    window.addEventListener("pointerdown", onFirstGesture, {
-      once: true,
-      passive: true,
-    });
-    window.addEventListener("touchstart", onFirstGesture, {
-      once: true,
-      passive: true,
-    });
+    window.addEventListener("pointerdown", onGesture, { passive: true });
+    window.addEventListener("touchstart", onGesture, { passive: true });
 
     layout();
     frame = window.requestAnimationFrame(tick);
@@ -564,8 +576,8 @@ export function ScrollScrub({
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("orientationchange", layout);
-      window.removeEventListener("pointerdown", onFirstGesture);
-      window.removeEventListener("touchstart", onFirstGesture);
+      window.removeEventListener("pointerdown", onGesture);
+      window.removeEventListener("touchstart", onGesture);
       root.style.removeProperty("--ss-progress");
       delete root.dataset.activeSection;
 

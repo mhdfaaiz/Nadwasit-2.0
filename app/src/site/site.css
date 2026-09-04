@@ -1506,6 +1506,17 @@
   }
 }
 
+/* The mobile film is a tall 9:20 cut, made for a phone held upright. The engine
+ * also serves it to any window under 860px, so a narrow LANDSCAPE window would
+ * crop straight through the middle of the bird. Letterbox there instead: the
+ * bars are the same black as the page, so they read as nothing at all. */
+@media (max-width: 53.75rem) and (orientation: landscape) {
+  .nw .scroll-scrub__video,
+  .nw .scroll-scrub__poster {
+    object-fit: contain;
+  }
+}
+
 /* ---------- Delivery apps ------------------------------------------------ */
 
 .nw-delivery {

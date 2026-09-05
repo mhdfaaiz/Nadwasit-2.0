@@ -23,6 +23,17 @@ export function applySecurityHeaders(response: Response): Response {
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   headers.set("X-XSS-Protection", "0");
+
+  // The SSR document names the hashed JS bundles, so a stale copy of it loads
+  // stale code no matter how fresh those bundles are. Without an explicit
+  // directive browsers fall back to heuristic caching, and Safari will happily
+  // serve a day-old document, which pins a phone to the previous deploy.
+  // `no-cache` still allows storage and 304s, it just forces revalidation.
+  // Hashed assets keep their own long-lived caching; this only targets HTML.
+  if (response.headers.get("Content-Type")?.includes("text/html")) {
+    headers.set("Cache-Control", "no-cache, must-revalidate");
+  }
+
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

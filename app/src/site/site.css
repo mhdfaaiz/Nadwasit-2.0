@@ -1702,6 +1702,21 @@
   font-weight: 600;
 }
 
+/* Marks a branch that takes calls rather than WhatsApp messages. */
+.nw-pick__tag {
+  display: inline-block;
+  margin-left: 0.6rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--nw-amber);
+  color: var(--nw-amber);
+  font-family: var(--nw-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  vertical-align: 0.1em;
+}
+
 .nw-pick__where {
   color: var(--nw-muted);
   font-size: 0.875rem;

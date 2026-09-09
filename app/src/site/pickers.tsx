@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
-import { BRANCHES, MENUS, waHref, type MenuEntry } from "./data";
+import { BRANCHES, hasWhatsApp, MENUS, waHref, type MenuEntry } from "./data";
 
 /**
  * Two choosers, one shell.
@@ -96,27 +96,36 @@ function OrderPicker({ onClose }: { onClose: () => void }) {
       title="Which branch is closest?"
     >
       <ul className="nw-picklist">
-        {BRANCHES.filter((branch) => !branch.head).map((branch) => (
-          <li key={branch.id}>
-            <a
-              className="nw-pick"
-              href={waHref(branch.phoneHref)}
-              rel="noreferrer noopener"
-              target="_blank"
-            >
-              <span className="nw-pick__main">
-                <span className="nw-pick__name">{branch.name}</span>
-                <span className="nw-pick__where">
-                  {branch.area}, {branch.emirate}
+        {BRANCHES.filter((branch) => !branch.head).map((branch) => {
+          // A landline branch cannot take a WhatsApp message, so that row dials
+          // instead of opening a chat and says so.
+          const chat = hasWhatsApp(branch.phoneHref);
+          return (
+            <li key={branch.id}>
+              <a
+                className="nw-pick"
+                href={chat ? waHref(branch.phoneHref) : branch.phoneHref}
+                {...(chat ? { rel: "noreferrer noopener", target: "_blank" } : {})}
+              >
+                <span className="nw-pick__main">
+                  <span className="nw-pick__name">
+                    {branch.name}
+                    {chat ? null : <span className="nw-pick__tag">Call</span>}
+                  </span>
+                  <span className="nw-pick__where">
+                    {branch.area}, {branch.emirate}
+                  </span>
                 </span>
-              </span>
-              <span className="nw-pick__side">
-                <span className="nw-pick__meta">{branch.phone}</span>
-                <span className="nw-pick__meta nw-pick__meta--dim">{branch.hours}</span>
-              </span>
-            </a>
-          </li>
-        ))}
+                <span className="nw-pick__side">
+                  <span className="nw-pick__meta">{branch.phone}</span>
+                  <span className="nw-pick__meta nw-pick__meta--dim">
+                    {branch.hours}
+                  </span>
+                </span>
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </Modal>
   );

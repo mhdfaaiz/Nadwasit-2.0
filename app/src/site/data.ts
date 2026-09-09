@@ -53,10 +53,10 @@ export const BRANCHES: Branch[] = [
     email: "nadwasitcafeteria@gmail.com",
     emirate: "Sharjah",
     hours: "6 AM to 3 AM",
-    id: "nadwasit-cafeteria",
-    name: "Nadwasit Cafeteria",
-    phone: "+971 50 981 3566",
-    phoneHref: "tel:+971509813566",
+    id: "nadwasit-fast-food",
+    name: "Nadwasit Fast Food",
+    phone: "+971 56 726 6284",
+    phoneHref: "tel:+971567266284",
   },
   {
     area: "Maysaloon",
@@ -65,8 +65,8 @@ export const BRANCHES: Branch[] = [
     hours: "6 AM to 3 AM",
     id: "tareeq-wasit",
     name: "Tareeq Wasit Restaurant",
-    phone: "+971 50 981 3567",
-    phoneHref: "tel:+971509813567",
+    phone: "+971 50 782 6682",
+    phoneHref: "tel:+971507826682",
   },
   {
     area: "Industrial Area",
@@ -75,8 +75,8 @@ export const BRANCHES: Branch[] = [
     hours: "6 AM to 3 AM",
     id: "ibn-al-jabal",
     name: "Ibn Al Jabal Restaurant",
-    phone: "+971 50 981 3568",
-    phoneHref: "tel:+971509813568",
+    phone: "+971 56 274 7002",
+    phoneHref: "tel:+971562747002",
   },
   {
     area: "Terminal 2 Freezone, Food Court",
@@ -85,8 +85,8 @@ export const BRANCHES: Branch[] = [
     hours: "Open 24 hours",
     id: "spring-onion",
     name: "Spring Onion Restaurant",
-    phone: "+971 50 981 3580",
-    phoneHref: "tel:+971509813580",
+    phone: "+971 56 365 1343",
+    phoneHref: "tel:+971563651343",
   },
   {
     area: "Al Barsha",
@@ -95,8 +95,8 @@ export const BRANCHES: Branch[] = [
     hours: "Open 24 hours",
     id: "spice-lab",
     name: "Spice Lab Restaurant",
-    phone: "+971 50 981 3581",
-    phoneHref: "tel:+971509813581",
+    phone: "+971 56 129 6309",
+    phoneHref: "tel:+971561296309",
   },
   {
     area: "Garhoud",
@@ -105,8 +105,8 @@ export const BRANCHES: Branch[] = [
     hours: "Open 24 hours",
     id: "century-express",
     name: "Century Express Restaurant",
-    phone: "+971 50 981 3582",
-    phoneHref: "tel:+971509813582",
+    phone: "+971 54 514 4224",
+    phoneHref: "tel:+971545144224",
   },
   {
     area: "Al Karama",
@@ -115,8 +115,8 @@ export const BRANCHES: Branch[] = [
     hours: "Open 24 hours",
     id: "karak-corner",
     name: "Karak Corner Cafeteria",
-    phone: "+971 50 981 3583",
-    phoneHref: "tel:+971509813583",
+    phone: "+971 50 551 7486",
+    phoneHref: "tel:+971505517486",
   },
   {
     area: "Al Zahra",
@@ -135,8 +135,8 @@ export const BRANCHES: Branch[] = [
     hours: "6 AM to 3 AM",
     id: "nadwasit-industrial",
     name: "Nadwasit Restaurant",
-    phone: "+971 50 981 3591",
-    phoneHref: "tel:+971509813591",
+    phone: "+971 58 290 9081",
+    phoneHref: "tel:+971582909081",
   },
 ];
 
@@ -280,9 +280,22 @@ export const MENUS: MenuEntry[] = [
   },
 ];
 
-/** "tel:+971509813566" becomes that branch's own WhatsApp thread. */
+/** "tel:+971507826682" becomes that branch's own WhatsApp thread. */
 export function waHref(phoneHref: string): string {
   return `https://wa.me/${phoneHref.replace(/\D/g, "")}`;
+}
+
+/** The UAE mobile prefixes. Everything else is a landline. */
+const UAE_MOBILE_PREFIXES = ["50", "52", "54", "55", "56", "58"];
+
+/**
+ * WhatsApp only works on a mobile number, so a branch on a landline (Al Atheen
+ * is on 06) needs a call rather than a chat. Sending it to wa.me would hand the
+ * customer a dead link.
+ */
+export function hasWhatsApp(phoneHref: string): boolean {
+  const digits = phoneHref.replace(/\D/g, "");
+  return UAE_MOBILE_PREFIXES.some((prefix) => digits.startsWith(`971${prefix}`));
 }
 
 export interface Service {

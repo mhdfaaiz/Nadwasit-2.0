@@ -53,6 +53,9 @@ export function Branches() {
                 </p>
                 <span className="nw-branch__side">
                   <span className="nw-branch__phone">{branch.phone}</span>
+                  {branch.altPhone ? (
+                    <span className="nw-branch__phone">{branch.altPhone}</span>
+                  ) : null}
                   <span className="nw-branch__hours">{branch.hours}</span>
                 </span>
               </a>

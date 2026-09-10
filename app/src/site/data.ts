@@ -31,6 +31,9 @@ export interface Branch {
   emirate: Emirate;
   phone: string;
   phoneHref: string;
+  /** A branch that runs a second line. Shown everywhere the first one is. */
+  altPhone?: string;
+  altPhoneHref?: string;
   email: string;
   hours: string;
   head?: boolean;
@@ -79,6 +82,8 @@ export const BRANCHES: Branch[] = [
     phoneHref: "tel:+971562747002",
   },
   {
+    altPhone: "+971 54 534 4224",
+    altPhoneHref: "tel:+971545344224",
     area: "Terminal 2 Freezone, Food Court",
     email: "springonion@gmail.com",
     emirate: "Dubai",
@@ -241,21 +246,18 @@ export interface MenuEntry {
   pages: number;
 }
 
-/** The five menus that exist, as published on the client's own site. */
+/**
+ * Every menu the group publishes, in the same order as the branch list so the
+ * two read the same way. `pages` must match the number of images actually in
+ * public/menus/<file>/, which are named p-01.jpg upwards.
+ */
 export const MENUS: MenuEntry[] = [
   {
-    file: "nadwasit",
-    id: "zahra",
-    name: "Nadwasit Restaurant",
-    pages: 28,
-    where: "Al Zahra, Ajman",
-  },
-  {
-    file: "nadwasit",
-    id: "industrial",
-    name: "Nadwasit Restaurant",
-    pages: 28,
-    where: "Industrial Area, Ajman",
+    file: "nadwasitfastfood",
+    id: "fastfood",
+    name: "Nadwasit Fast Food",
+    pages: 12,
+    where: "Al Atheen, Sharjah",
   },
   {
     file: "tareek",
@@ -277,6 +279,41 @@ export const MENUS: MenuEntry[] = [
     name: "Spring Onion Restaurant",
     pages: 12,
     where: "Terminal 2 Freezone, Dubai",
+  },
+  {
+    file: "spicelab",
+    id: "spicelab",
+    name: "Spice Lab Restaurant",
+    pages: 8,
+    where: "Al Barsha, Dubai",
+  },
+  {
+    file: "centuryexpress",
+    id: "century",
+    name: "Century Express Restaurant",
+    pages: 8,
+    where: "Garhoud, Dubai",
+  },
+  {
+    file: "karakcorner",
+    id: "karak",
+    name: "Karak Corner Cafeteria",
+    pages: 4,
+    where: "Al Karama, Dubai",
+  },
+  {
+    file: "nadwasit",
+    id: "zahra",
+    name: "Nadwasit Restaurant",
+    pages: 28,
+    where: "Al Zahra, Ajman",
+  },
+  {
+    file: "nadwasit",
+    id: "industrial",
+    name: "Nadwasit Restaurant",
+    pages: 28,
+    where: "Industrial Area, Ajman",
   },
 ];
 

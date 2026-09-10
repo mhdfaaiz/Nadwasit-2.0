@@ -118,6 +118,9 @@ function OrderPicker({ onClose }: { onClose: () => void }) {
                 </span>
                 <span className="nw-pick__side">
                   <span className="nw-pick__meta">{branch.phone}</span>
+                  {branch.altPhone ? (
+                    <span className="nw-pick__meta">{branch.altPhone}</span>
+                  ) : null}
                   <span className="nw-pick__meta nw-pick__meta--dim">
                     {branch.hours}
                   </span>

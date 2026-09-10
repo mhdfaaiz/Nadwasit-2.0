@@ -1370,6 +1370,12 @@
     display: inline;
   }
 
+  /* A branch with a second line runs both numbers on one row here, so they
+   * need a gap or they read as one long number. */
+  .nw-branch__phone + .nw-branch__phone {
+    margin-left: 0.85rem;
+  }
+
   .nw-branch__hours {
     margin-top: 0;
     margin-left: 0.85rem;
